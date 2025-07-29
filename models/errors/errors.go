@@ -7,3 +7,11 @@ type InvalidCredentailsError struct {
 func (e InvalidCredentailsError) Error() string {
 	return e.Message
 }
+
+type UnauthorizedError struct {
+	Message string
+}
+
+func (e UnauthorizedError) Error() string {
+	return e.Message
+}

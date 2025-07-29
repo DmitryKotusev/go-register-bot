@@ -14,7 +14,7 @@ import (
 
 func Login(client *http.Client, loginData models.LoginData) (string, error) {
 	if client == nil {
-		return "", fmt.Errorf("HTTP client is nil")
+		return "", fmt.Errorf("Login, HTTP client is nil")
 	}
 	loginURL := globalvars.LoginRequestUrl
 	userEmail := loginData.Email
@@ -26,13 +26,11 @@ func Login(client *http.Client, loginData models.LoginData) (string, error) {
 	}
 
 	payloadBytes, err := json.Marshal(payload)
-
 	if err != nil {
 		return "", fmt.Errorf("Login request error encoding JSON: %v", err)
 	}
 
 	req, err := http.NewRequest("POST", loginURL, bytes.NewBuffer(payloadBytes))
-
 	if err != nil {
 		return "", fmt.Errorf("Login request error creating request: %v", err)
 	}
@@ -43,24 +41,26 @@ func Login(client *http.Client, loginData models.LoginData) (string, error) {
 
 	fmt.Println("Sending login request...")
 	resp, err := client.Do(req)
-
 	if err != nil {
 		return "", fmt.Errorf("Login request error executing: %v", err)
 	}
-
 	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK && !(http.StatusBadRequest <= resp.StatusCode && resp.StatusCode < 500) {
+		return "", fmt.Errorf("Login request failed with status: %s", resp.Status)
+	}
 
 	fmt.Printf("Login response: %s\n", resp.Status)
 
 	body, err := io.ReadAll(resp.Body)
-
 	if err != nil {
 		return "", fmt.Errorf("Login request error reading response body: %v", err)
 	}
 
 	var loginResp models.LoginResponse
-
-	json.Unmarshal(body, &loginResp)
+	err = json.Unmarshal(body, &loginResp)
+	if err != nil {
+		return "", fmt.Errorf("Login body JSON parcing error: %v", err)
+	}
 
 	if loginResp.IsAuthSuccessful {
 		fmt.Printf("✅ Successful login!\n")

@@ -11,5 +11,6 @@ var (
 	KeepAliveHeader      = "keep-alive"
 	AcceptEncodingHeader = "gzip, deflate, br, zstd"
 
-	LoginRequestUrl = "https://inpol.mazowieckie.pl/identity/sign-in"
+	LoginRequestUrl                = "https://inpol.mazowieckie.pl/identity/sign-in"
+	GetActiveProceedingsRequestUrl = "https://inpol.mazowieckie.pl/api/foreigner/active-proceedings"
 )
