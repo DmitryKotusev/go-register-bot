@@ -2,9 +2,11 @@ package requests
 
 import (
 	"bot-main/models"
+	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
 	"bot-main/requests/login"
 	"crypto/tls"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"net/http"
@@ -15,17 +17,21 @@ import (
 func RequestPipeline(loginData models.LoginData) error {
 	// Creating custom transport, disabling HTTP/2.
 	// We are cloning default transport and changing only one setting.
+	// TODO: Consider using a custom transport to be able to auto uncompress gzip responses.
 	transport := http.DefaultTransport.(*http.Transport).Clone()
 	transport.TLSClientConfig = &tls.Config{
 		NextProtos: []string{"http/1.1"},
 	}
+	// Disabling compression as we are doing it ourselves.
+	transport.DisableCompression = true
+
 	jar, err := cookiejar.New(nil)
 	if err != nil {
 		return fmt.Errorf("RequestPipeline error creating cookie jar: %v", err)
 	}
 	client := &http.Client{
 		Jar:       jar,
-		Transport: transport,
+		Transport: &DecompressingTransport{Transport: transport},
 	}
 
 	fmt.Println()
@@ -47,5 +53,26 @@ func RequestPipeline(loginData models.LoginData) error {
 	}
 	fmt.Printf("Login request completed successfully, token: %s.\n", sessionToken)
 
+	time.Sleep(time.Duration(rand.Intn(6)+1) * time.Second)
+
+	fmt.Println()
+	fmt.Println("RequestPipeline, trying to get active proceedings...")
+	activeProceedings, err := activeproceedings.GetActiveProceedings(client, sessionToken)
+	if err != nil {
+		fmt.Printf("RequestPipeline error during getting active proceedings: %v", err)
+		return err
+	}
+	fmt.Println("Get active proceedings request completed successfully, proceedings:")
+	printActiveProceedingsSlice(activeProceedings)
+
 	return nil
+}
+
+func printActiveProceedingsSlice(slice []models.ActiveProceeding) {
+	data, err := json.MarshalIndent(slice, "", "  ")
+	if err != nil {
+		fmt.Println("Error:", err)
+		return
+	}
+	fmt.Println(string(data))
 }
