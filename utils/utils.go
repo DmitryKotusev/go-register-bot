@@ -11,34 +11,40 @@ import (
 	"strings"
 )
 
-func ReadRequiredLoginData() models.LoginData {
-	// Data for enter
-	var email, password string
-	flag.StringVar(&email, "email", "", "Login email for enter")
-	flag.StringVar(&password, "password", "", "Password for enter")
-
-	// Flag parsing
+func RegisterCommandLineArgs() {
+	flag.StringVar(&globalvars.Email, "email", "", "Login email for enter")
+	flag.StringVar(&globalvars.Password, "password", "", "Password for enter")
+	flag.IntVar(&globalvars.ProceedingsCheckIndex, "proceedings-check-index", 0, "Proceedings check index for enter from end (by default 0)")
 	flag.Parse()
+}
 
+func ReadRequiredApplicationData() models.ApplicationData {
+	return models.ApplicationData{
+		LoginData:             ReadRequiredLoginData(),
+		ProceedingsCheckIndex: globalvars.ProceedingsCheckIndex,
+	}
+}
+
+func ReadRequiredLoginData() models.LoginData {
 	// Checking if data was entered. If not, request it.
-	if email == "" {
-		email = ReadStringFromConsole("Enter email: ")
+	if globalvars.Email == "" {
+		globalvars.Email = ReadStringFromConsole("Enter email: ")
 	}
 
-	if password == "" {
-		password = ReadStringFromConsole("Enter password: ")
+	if globalvars.Password == "" {
+		globalvars.Password = ReadStringFromConsole("Enter password: ")
 	}
 
 	// Printing the entered data for check
 	fmt.Println("\n---")
 	fmt.Printf("✅ Login data saved.\n")
-	fmt.Printf("Email: %s\n", email)
-	fmt.Printf("Password: %s [Length: %d]\n", password, len(password))
+	fmt.Printf("Email: %s\n", globalvars.Email)
+	fmt.Printf("Password: %s [Length: %d]\n", globalvars.Password, len(globalvars.Password))
 	fmt.Println("---")
 
 	return models.LoginData{
-		Email:    email,
-		Password: password,
+		Email:    globalvars.Email,
+		Password: globalvars.Password,
 	}
 }
 

@@ -2,6 +2,7 @@ package requests
 
 import (
 	"bot-main/models"
+	modelerrors "bot-main/models/errors"
 	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
 	"bot-main/requests/login"
@@ -14,7 +15,7 @@ import (
 	"time"
 )
 
-func RequestPipeline(loginData models.LoginData) error {
+func RequestPipeline(applicationData models.ApplicationData) error {
 	// Creating custom transport, disabling HTTP/2.
 	// We are cloning default transport and changing only one setting.
 	// TODO: Consider using a custom transport to be able to auto uncompress gzip responses.
@@ -46,14 +47,14 @@ func RequestPipeline(loginData models.LoginData) error {
 
 	fmt.Println()
 	fmt.Println("RequestPipeline, trying to login...")
-	sessionToken, err := login.Login(client, loginData)
+	sessionToken, err := login.Login(client, applicationData.LoginData)
 	if err != nil {
 		fmt.Printf("RequestPipeline error during login: %v", err)
 		return err
 	}
 	fmt.Printf("Login request completed successfully, token: %s.\n", sessionToken)
 
-	time.Sleep(time.Duration(rand.Intn(6)+1) * time.Second)
+	time.Sleep(time.Duration(rand.Intn(5)+1) * time.Second)
 
 	fmt.Println()
 	fmt.Println("RequestPipeline, trying to get active proceedings...")
@@ -64,6 +65,20 @@ func RequestPipeline(loginData models.LoginData) error {
 	}
 	fmt.Println("Get active proceedings request completed successfully, proceedings:")
 	printActiveProceedingsSlice(activeProceedings)
+	if len(activeProceedings) <= applicationData.ProceedingsCheckIndex {
+		fmt.Println("RequestPipeline, proceedings length and index incompatibility, returning error.")
+		return modelerrors.ProceedingsCountError{
+			Message: fmt.Sprintf("❌ RequestPipeline failed because proceedings count and index incompatibility: %d and %d.",
+				len(activeProceedings),
+				applicationData.ProceedingsCheckIndex),
+		}
+	}
+
+	time.Sleep(time.Duration(rand.Intn(5)+1) * time.Second)
+
+	relevantProceeding := activeProceedings[len(activeProceedings)-1-applicationData.ProceedingsCheckIndex]
+	fmt.Println()
+	fmt.Printf("RequestPipeline, trying to get queues for reservation %s...\n", relevantProceeding.ProceedingsID)
 
 	return nil
 }

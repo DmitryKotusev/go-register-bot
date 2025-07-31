@@ -9,6 +9,7 @@ import (
 func main() {
 	fmt.Println("Starting the bot, press Ctrl+C to stop it at any time.")
 	fmt.Println("Reading input data...")
-	loginData := utils.ReadRequiredLoginData()
-	requests.RequestPipeline(loginData)
+	utils.RegisterCommandLineArgs()
+	applicationData := utils.ReadRequiredApplicationData()
+	requests.RequestPipeline(applicationData)
 }

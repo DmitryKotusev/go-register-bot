@@ -15,3 +15,11 @@ type UnauthorizedError struct {
 func (e UnauthorizedError) Error() string {
 	return e.Message
 }
+
+type ProceedingsCountError struct {
+	Message string
+}
+
+func (e ProceedingsCountError) Error() string {
+	return e.Message
+}

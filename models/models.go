@@ -1,5 +1,10 @@
 package models
 
+type ApplicationData struct {
+	LoginData             LoginData
+	ProceedingsCheckIndex int
+}
+
 type LoginData struct {
 	Email    string
 	Password string
