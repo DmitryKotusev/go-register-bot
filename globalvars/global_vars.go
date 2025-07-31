@@ -10,12 +10,13 @@ var (
 	Origin           = "https://inpol.mazowieckie.pl"
 	LoginPageUrl     = "https://inpol.mazowieckie.pl/login"
 	HomePageUrl      = "https://inpol.mazowieckie.pl/home"
-	HomePageCasesUrl = "https://inpol.mazowieckie.pl/home/cases/"
+	HomePageCasesUrl = "https://inpol.mazowieckie.pl/home/cases/%s"
 
 	HtmlAcceptHeader     = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8"
 	KeepAliveHeader      = "keep-alive"
 	AcceptEncodingHeader = "gzip, deflate, br, zstd"
 
-	LoginRequestUrl                = "https://inpol.mazowieckie.pl/identity/sign-in"
-	GetActiveProceedingsRequestUrl = "https://inpol.mazowieckie.pl/api/foreigner/active-proceedings"
+	LoginRequestUrl                          = "https://inpol.mazowieckie.pl/identity/sign-in"
+	GetActiveProceedingsRequestUrl           = "https://inpol.mazowieckie.pl/api/foreigner/active-proceedings"
+	GetProceedingReservationQueuesRequestUrl = "https://inpol.mazowieckie.pl/api/proceedings/%s/reservationQueues"
 )

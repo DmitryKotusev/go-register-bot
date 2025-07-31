@@ -43,3 +43,13 @@ type ProceedingsType struct {
 	OrderBy   string `json:"orderBy"`
 	Active    bool   `json:"active"`
 }
+
+type ReservationQueue struct {
+	Localization string `json:"localization"`
+	Prefix       string `json:"prefix"`
+	ID           string `json:"id"`
+	Polish       string `json:"polish"`
+	English      string `json:"english"`
+	Russian      string `json:"russian"`
+	Ukrainian    string `json:"ukrainian"`
+}
