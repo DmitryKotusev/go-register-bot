@@ -6,6 +6,7 @@ import (
 	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
 	"bot-main/requests/login"
+	"bot-main/requests/reservationqueues"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -64,7 +65,7 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 		return err
 	}
 	fmt.Println("Get active proceedings request completed successfully, proceedings:")
-	printActiveProceedingsSlice(activeProceedings)
+	printData(activeProceedings)
 	if len(activeProceedings) <= applicationData.ProceedingsCheckIndex {
 		fmt.Println("RequestPipeline, proceedings length and index incompatibility, returning error.")
 		return modelerrors.ProceedingsCountError{
@@ -79,12 +80,19 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 	relevantProceeding := activeProceedings[len(activeProceedings)-1-applicationData.ProceedingsCheckIndex]
 	fmt.Println()
 	fmt.Printf("RequestPipeline, trying to get queues for reservation %s...\n", relevantProceeding.ProceedingsID)
+	reservationQueues, err := reservationqueues.GetReservationQueues(client, sessionToken, relevantProceeding)
+	if err != nil {
+		fmt.Printf("RequestPipeline error during getting reservation queues: %v", err)
+		return err
+	}
+	fmt.Printf("Get reservation queues for %s completed successfully, queues:\n", relevantProceeding.ProceedingsID)
+	printData(reservationQueues)
 
 	return nil
 }
 
-func printActiveProceedingsSlice(slice []models.ActiveProceeding) {
-	data, err := json.MarshalIndent(slice, "", "  ")
+func printData(input any) {
+	data, err := json.MarshalIndent(input, "", "  ")
 	if err != nil {
 		fmt.Println("Error:", err)
 		return
