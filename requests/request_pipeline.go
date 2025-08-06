@@ -5,6 +5,7 @@ import (
 	modelerrors "bot-main/models/errors"
 	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
+	"bot-main/requests/dates"
 	"bot-main/requests/login"
 	"bot-main/requests/reservationqueues"
 	"crypto/tls"
@@ -44,7 +45,8 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 		return err
 	}
 
-	time.Sleep(time.Duration(rand.Intn(5)+1) * time.Second)
+	//////////////////////////////////////////////////////
+	time.Sleep(time.Duration(rand.Intn(2)+1) * time.Second)
 
 	fmt.Println()
 	fmt.Println("RequestPipeline, trying to login...")
@@ -55,7 +57,8 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 	}
 	fmt.Printf("Login request completed successfully, token: %s.\n", sessionToken)
 
-	time.Sleep(time.Duration(rand.Intn(5)+1) * time.Second)
+	//////////////////////////////////////////////////////
+	time.Sleep(time.Duration(rand.Intn(2)+1) * time.Second)
 
 	fmt.Println()
 	fmt.Println("RequestPipeline, trying to get active proceedings...")
@@ -75,9 +78,10 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 		}
 	}
 
-	time.Sleep(time.Duration(rand.Intn(5)+1) * time.Second)
+	//////////////////////////////////////////////////////
+	time.Sleep(time.Duration(rand.Intn(2)+1) * time.Second)
 
-	relevantProceeding := activeProceedings[len(activeProceedings)-1-applicationData.ProceedingsCheckIndex]
+	relevantProceeding := activeProceedings[applicationData.ProceedingsCheckIndex]
 	fmt.Println()
 	fmt.Printf("RequestPipeline, trying to get queues for reservation %s...\n", relevantProceeding.ProceedingsID)
 	reservationQueues, err := reservationqueues.GetReservationQueues(client, sessionToken, relevantProceeding)
@@ -87,6 +91,20 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 	}
 	fmt.Printf("Get reservation queues for %s completed successfully, queues:\n", relevantProceeding.ProceedingsID)
 	printData(reservationQueues)
+
+	//////////////////////////////////////////////////////
+	time.Sleep(time.Duration(rand.Intn(2)+1) * time.Second)
+
+	relevantQueue := reservationQueues[0]
+	fmt.Println()
+	fmt.Printf("RequestPipeline, trying to get dates for query %s...\n", relevantQueue.ID)
+	queueDates, err := dates.GetReservationQueueDates(client, sessionToken, relevantProceeding, relevantQueue)
+	if err != nil {
+		fmt.Printf("RequestPipeline error during getting queue dates: %v", err)
+		return err
+	}
+	fmt.Printf("Get queue dates for %s completed successfully, dates:\n", relevantQueue.ID)
+	printData(queueDates)
 
 	return nil
 }

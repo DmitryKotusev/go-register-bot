@@ -19,4 +19,7 @@ var (
 	LoginRequestUrl                          = "https://inpol.mazowieckie.pl/identity/sign-in"
 	GetActiveProceedingsRequestUrl           = "https://inpol.mazowieckie.pl/api/foreigner/active-proceedings"
 	GetProceedingReservationQueuesRequestUrl = "https://inpol.mazowieckie.pl/api/proceedings/%s/reservationQueues"
+	GetReservationQueueDatesRequestUrl       = "https://inpol.mazowieckie.pl/api/reservations/queue/%s/dates"
+	GetReservationQueueDateSlotsRequestUrl   = "reservations/queue/%s/%s/slots" // reservations/queue/:queueId/:date/slots
+	ReserveAppointmentRequestUrl             = "reservations/queue/%s/reserve"  // reservations/queue/:queueId/reserve
 )
