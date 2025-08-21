@@ -19,15 +19,15 @@ func TestGetReservationQueues(t *testing.T) {
 	globalvars.GetProceedingReservationQueuesRequestUrl = "https://fake/proceedings/%s/queues"
 	globalvars.HomePageCasesUrl = "https://fake/cases/%s"
 
-	sampleProceeding := models.ActiveProceeding{
-		ProceedingsID: "12345",
+	sampleProceeding := models.DetailedProceedingData{
+		ID: "12345",
 	}
 
 	testCases := []struct {
 		name         string
 		client       *http.Client
 		sessionToken string
-		proceeding   models.ActiveProceeding
+		proceeding   *models.DetailedProceedingData
 		wantList     []models.ReservationQueue
 		wantErrStr   string
 		wantErrType  any
@@ -36,6 +36,14 @@ func TestGetReservationQueues(t *testing.T) {
 			name:       "nil client",
 			client:     nil,
 			wantErrStr: "GetReservationQueues, HTTP client is nil",
+		},
+		{
+			name: "nil proceeding",
+			client: test_utils.NewTestClient(func(req *http.Request) *http.Response {
+				return &http.Response{}
+			}),
+			proceeding: nil,
+			wantErrStr: "GetReservationQueues, proceeding data is nil",
 		},
 		{
 			name: "successful response",
@@ -52,7 +60,7 @@ func TestGetReservationQueues(t *testing.T) {
 				}
 			}),
 			sessionToken: "token123",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			wantList: []models.ReservationQueue{
 				{ID: "q1", Prefix: "Queue 1"},
 				{ID: "q2", Prefix: "Queue 2"},
@@ -68,7 +76,7 @@ func TestGetReservationQueues(t *testing.T) {
 				}
 			}),
 			sessionToken: "badtoken",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			wantErrStr:   "❌ GetReservationQueues failed because of unauthorized status code",
 			wantErrType:  &modelerrors.UnauthorizedError{},
 		},
@@ -82,7 +90,7 @@ func TestGetReservationQueues(t *testing.T) {
 				}
 			}),
 			sessionToken: "token123",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			wantErrStr:   "GetReservationQueues request failed with status: 500 Internal Server Error",
 		},
 		{
@@ -94,7 +102,7 @@ func TestGetReservationQueues(t *testing.T) {
 				}
 			}),
 			sessionToken: "token123",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			wantErrStr:   "GetReservationQueues body JSON parcing error",
 		},
 	}

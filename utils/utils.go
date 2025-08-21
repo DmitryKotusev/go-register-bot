@@ -14,7 +14,7 @@ import (
 func RegisterCommandLineArgs() {
 	flag.StringVar(&globalvars.Email, "email", "", "Login email for enter")
 	flag.StringVar(&globalvars.Password, "password", "", "Password for enter")
-	flag.IntVar(&globalvars.ProceedingsCheckIndex, "proceedings-check-index", 0, "Proceedings check index for enter from end (by default 0)")
+	flag.IntVar(&globalvars.ProceedingsCheckIndex, "proceedings-check-index", 0, "Proceedings check index for enter(by default 0)")
 	flag.Parse()
 }
 

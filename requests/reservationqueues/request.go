@@ -11,12 +11,15 @@ import (
 	"net/http"
 )
 
-func GetReservationQueues(client *http.Client, sessionToken string, proceeding models.ActiveProceeding) ([]models.ReservationQueue, error) {
+func GetReservationQueues(client *http.Client, sessionToken string, proceeding *models.DetailedProceedingData) ([]models.ReservationQueue, error) {
 	if client == nil {
 		return nil, fmt.Errorf("GetReservationQueues, HTTP client is nil")
 	}
-	getProceedingReservationQueuesRequestUrl := fmt.Sprintf(globalvars.GetProceedingReservationQueuesRequestUrl, proceeding.ProceedingsID)
-	homePageCasesUrl := fmt.Sprintf(globalvars.HomePageCasesUrl, proceeding.ProceedingsID)
+	if proceeding == nil {
+		return nil, fmt.Errorf("GetReservationQueues, proceeding data is nil")
+	}
+	getProceedingReservationQueuesRequestUrl := fmt.Sprintf(globalvars.GetProceedingReservationQueuesRequestUrl, proceeding.ID)
+	homePageCasesUrl := fmt.Sprintf(globalvars.HomePageCasesUrl, proceeding.ID)
 	req, err := http.NewRequest("GET", getProceedingReservationQueuesRequestUrl, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetReservationQueues request error creating request: %v", err)

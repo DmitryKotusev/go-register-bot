@@ -19,8 +19,8 @@ func TestGetReservationQueueDates(t *testing.T) {
 	globalvars.GetReservationQueueDatesRequestUrl = "https://fake/queue/%s/dates"
 	globalvars.HomePageCasesUrl = "https://fake/cases/%s"
 
-	sampleProceeding := models.ActiveProceeding{
-		ProceedingsID: "abc123",
+	sampleProceeding := models.DetailedProceedingData{
+		ID: "abc123",
 	}
 
 	sampleQueue := models.ReservationQueue{
@@ -32,7 +32,7 @@ func TestGetReservationQueueDates(t *testing.T) {
 		name         string
 		client       *http.Client
 		sessionToken string
-		proceeding   models.ActiveProceeding
+		proceeding   *models.DetailedProceedingData
 		queue        models.ReservationQueue
 		wantDates    []string
 		wantErrStr   string
@@ -44,9 +44,17 @@ func TestGetReservationQueueDates(t *testing.T) {
 			wantErrStr: "GetReservationQueueDates, HTTP client is nil",
 		},
 		{
+			name: "nil proceeding",
+			client: test_utils.NewTestClient(func(req *http.Request) *http.Response {
+				return &http.Response{}
+			}),
+			proceeding: nil,
+			wantErrStr: "GetReservationQueueDates, proceeding data is nil",
+		},
+		{
 			name: "successful response",
 			client: test_utils.NewTestClient(func(req *http.Request) *http.Response {
-				body, _ := json.Marshal([]string{"2025-08-10", "2025-08-12"})
+				body, _ := json.Marshal([]string{"2025-08-10T00:00:00", "2025-08-12T00:00:00"})
 				return &http.Response{
 					StatusCode: http.StatusOK,
 					Body:       io.NopCloser(bytes.NewReader(body)),
@@ -54,7 +62,7 @@ func TestGetReservationQueueDates(t *testing.T) {
 				}
 			}),
 			sessionToken: "valid-token",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			queue:        sampleQueue,
 			wantDates:    []string{"2025-08-10", "2025-08-12"},
 		},
@@ -68,7 +76,7 @@ func TestGetReservationQueueDates(t *testing.T) {
 				}
 			}),
 			sessionToken: "invalid-token",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			queue:        sampleQueue,
 			wantErrStr:   "❌ GetReservationQueueDates failed because of unauthorized status code",
 			wantErrType:  &modelerrors.UnauthorizedError{},
@@ -83,7 +91,7 @@ func TestGetReservationQueueDates(t *testing.T) {
 				}
 			}),
 			sessionToken: "valid-token",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			queue:        sampleQueue,
 			wantErrStr:   "GetReservationQueueDates request failed with status: 500 Internal Server Error",
 		},
@@ -96,7 +104,7 @@ func TestGetReservationQueueDates(t *testing.T) {
 				}
 			}),
 			sessionToken: "valid-token",
-			proceeding:   sampleProceeding,
+			proceeding:   &sampleProceeding,
 			queue:        sampleQueue,
 			wantErrStr:   "GetReservationQueueDates body JSON parcing error",
 		},

@@ -9,18 +9,22 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 func GetReservationQueueDates(
 	client *http.Client,
 	sessionToken string,
-	proceeding models.ActiveProceeding,
+	proceeding *models.DetailedProceedingData,
 	reservationQueue models.ReservationQueue) ([]string, error) {
 	if client == nil {
 		return nil, fmt.Errorf("GetReservationQueueDates, HTTP client is nil")
 	}
+	if proceeding == nil {
+		return nil, fmt.Errorf("GetReservationQueueDates, proceeding data is nil")
+	}
 	getReservationQueueDatesRequestUrl := fmt.Sprintf(globalvars.GetReservationQueueDatesRequestUrl, reservationQueue.ID)
-	homePageCasesUrl := fmt.Sprintf(globalvars.HomePageCasesUrl, proceeding.ProceedingsID)
+	homePageCasesUrl := fmt.Sprintf(globalvars.HomePageCasesUrl, proceeding.ID)
 	req, err := http.NewRequest("POST", getReservationQueueDatesRequestUrl, nil)
 	if err != nil {
 		return nil, fmt.Errorf("GetReservationQueueDates request error creating request: %v", err)
@@ -58,6 +62,11 @@ func GetReservationQueueDates(
 	err = json.Unmarshal(body, &reservationQueueDates)
 	if err != nil {
 		return nil, fmt.Errorf("GetReservationQueueDates body JSON parcing error: %v", err)
+	}
+
+	for i, date := range reservationQueueDates {
+		newDate := strings.Split(date, "T")[0]
+		reservationQueueDates[i] = newDate
 	}
 
 	return reservationQueueDates, nil
