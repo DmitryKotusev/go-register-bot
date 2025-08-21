@@ -38,10 +38,8 @@ func TestGetReservationQueues(t *testing.T) {
 			wantErrStr: "GetReservationQueues, HTTP client is nil",
 		},
 		{
-			name: "nil proceeding",
-			client: test_utils.NewTestClient(func(req *http.Request) *http.Response {
-				return &http.Response{}
-			}),
+			name:       "nil proceeding",
+			client:     &http.Client{},
 			proceeding: nil,
 			wantErrStr: "GetReservationQueues, proceeding data is nil",
 		},

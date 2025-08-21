@@ -44,10 +44,8 @@ func TestGetReservationQueueDates(t *testing.T) {
 			wantErrStr: "GetReservationQueueDates, HTTP client is nil",
 		},
 		{
-			name: "nil proceeding",
-			client: test_utils.NewTestClient(func(req *http.Request) *http.Response {
-				return &http.Response{}
-			}),
+			name:       "nil proceeding",
+			client:     &http.Client{},
 			proceeding: nil,
 			wantErrStr: "GetReservationQueueDates, proceeding data is nil",
 		},

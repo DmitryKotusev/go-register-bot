@@ -6,6 +6,7 @@ import (
 	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
 	"bot-main/requests/dates"
+	"bot-main/requests/dateslots"
 	"bot-main/requests/login"
 	"bot-main/requests/proceeding"
 	"bot-main/requests/reservationqueues"
@@ -111,7 +112,7 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 
 	relevantQueue := reservationQueues[0]
 	fmt.Println()
-	fmt.Printf("RequestPipeline, trying to get dates for query %s...\n", relevantQueue.ID)
+	fmt.Printf("RequestPipeline, trying to get dates for query %s...\n", relevantQueue.Localization)
 	queueDates, err := dates.GetReservationQueueDates(client, sessionToken, proceedingData, relevantQueue)
 	if err != nil {
 		fmt.Printf("RequestPipeline error during getting queue dates: %v", err)
@@ -122,6 +123,17 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 
 	//////////////////////////////////////////////////////
 	time.Sleep(time.Duration(rand.Float32()) * time.Second)
+
+	queueDate := queueDates[0]
+	fmt.Println()
+	fmt.Printf("RequestPipeline, trying to get date slots for date %s at %s...\n", queueDate, relevantQueue.Localization)
+	queueDateSlots, err := dateslots.GetReservationQueueDateSlots(client, sessionToken, proceedingData, relevantQueue, queueDate)
+	if err != nil {
+		fmt.Printf("RequestPipeline error during getting queue date slots: %v", err)
+		return err
+	}
+	fmt.Printf("Get queue date slots for %s completed successfully, date slots:\n", relevantQueue.Localization)
+	printData(queueDateSlots)
 
 	return nil
 }
