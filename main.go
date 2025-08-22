@@ -7,6 +7,7 @@ import (
 )
 
 func main() {
+	// Look at ability to use https://github.com/fatih/color
 	fmt.Println("Starting the bot, press Ctrl+C to stop it at any time.")
 	fmt.Println("Reading input data...")
 	utils.RegisterCommandLineArgs()

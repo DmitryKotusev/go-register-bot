@@ -16,6 +16,14 @@ func (e UnauthorizedError) Error() string {
 	return e.Message
 }
 
+type ForbiddenError struct {
+	Message string
+}
+
+func (e ForbiddenError) Error() string {
+	return e.Message
+}
+
 type ProceedingsCountError struct {
 	Message string
 }

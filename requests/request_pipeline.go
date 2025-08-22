@@ -5,11 +5,10 @@ import (
 	modelerrors "bot-main/models/errors"
 	"bot-main/requests/activeproceedings"
 	"bot-main/requests/cookiesinit"
-	"bot-main/requests/dates"
-	"bot-main/requests/dateslots"
 	"bot-main/requests/login"
 	"bot-main/requests/proceeding"
 	"bot-main/requests/reservationqueues"
+	"bot-main/requests/reserve"
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
@@ -111,29 +110,46 @@ func RequestPipeline(applicationData models.ApplicationData) error {
 	time.Sleep(time.Duration(rand.Float32()) * time.Second)
 
 	relevantQueue := reservationQueues[0]
+	// fmt.Println()
+	// fmt.Printf("RequestPipeline, trying to get dates for query %s...\n", relevantQueue.Localization)
+	// queueDates, err := dates.GetReservationQueueDates(client, sessionToken, proceedingData, relevantQueue)
+	// if err != nil {
+	// 	fmt.Printf("RequestPipeline error during getting queue dates: %v", err)
+	// 	return err
+	// }
+	// fmt.Printf("Get queue dates for %s completed successfully, dates:\n", relevantQueue.ID)
+	// printData(queueDates)
+
+	// //////////////////////////////////////////////////////
+	// time.Sleep(time.Duration(rand.Float32()) * time.Second)
+
+	// queueDate := queueDates[len(queueDates)-1]
+	// fmt.Println()
+	// fmt.Printf("RequestPipeline, trying to get date slots for date %s at %s...\n", queueDate, relevantQueue.Localization)
+	// queueDateSlots, err := dateslots.GetReservationQueueDateSlots(client, sessionToken, proceedingData, relevantQueue, queueDate)
+	// if err != nil {
+	// 	fmt.Printf("RequestPipeline error during getting queue date slots: %v", err)
+	// 	return err
+	// }
+	// fmt.Printf("Get queue date slots for %s completed successfully, date slots:\n", relevantQueue.Localization)
+	// printData(queueDateSlots)
+
+	// //////////////////////////////////////////////////////
+	// time.Sleep(time.Duration(rand.Float32()) * time.Second)
+
+	mockSlot := models.Slot{
+		ID:    23499339,
+		Count: 1,
+		Date:  "2025-10-03T14:25:00",
+	}
 	fmt.Println()
-	fmt.Printf("RequestPipeline, trying to get dates for query %s...\n", relevantQueue.Localization)
-	queueDates, err := dates.GetReservationQueueDates(client, sessionToken, proceedingData, relevantQueue)
+	fmt.Printf("RequestPipeline, trying to reserve date slot %s at %s...\n", mockSlot.Date, relevantQueue.Localization)
+	err = reserve.ReserveDateSlot(client, sessionToken, proceedingData, relevantQueue, mockSlot)
 	if err != nil {
-		fmt.Printf("RequestPipeline error during getting queue dates: %v", err)
+		fmt.Printf("RequestPipeline error during reserving date slot: %v", err)
 		return err
 	}
-	fmt.Printf("Get queue dates for %s completed successfully, dates:\n", relevantQueue.ID)
-	printData(queueDates)
-
-	//////////////////////////////////////////////////////
-	time.Sleep(time.Duration(rand.Float32()) * time.Second)
-
-	queueDate := queueDates[0]
-	fmt.Println()
-	fmt.Printf("RequestPipeline, trying to get date slots for date %s at %s...\n", queueDate, relevantQueue.Localization)
-	queueDateSlots, err := dateslots.GetReservationQueueDateSlots(client, sessionToken, proceedingData, relevantQueue, queueDate)
-	if err != nil {
-		fmt.Printf("RequestPipeline error during getting queue date slots: %v", err)
-		return err
-	}
-	fmt.Printf("Get queue date slots for %s completed successfully, date slots:\n", relevantQueue.Localization)
-	printData(queueDateSlots)
+	fmt.Printf("Reserving date slot for %s for %s completed successfully!\n", relevantQueue.Localization, mockSlot.Date)
 
 	return nil
 }

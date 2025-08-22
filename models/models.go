@@ -18,6 +18,14 @@ type LoginPayload struct {
 	ExpiryMinutes int    `json:"expiryMinutes"`
 }
 
+type ReservePayload struct {
+	ProceedingID string `json:"proceedingId"`
+	SlotID       int64  `json:"slotId"`
+	Name         string `json:"name"`
+	LastName     string `json:"lastName"`
+	DateOfBirth  string `json:"dateOfBirth"` // ISO8601
+}
+
 type LoginResponse struct {
 	IsAuthSuccessful bool    `json:"isAuthSuccessful"`
 	ErrorMessage     any     `json:"errorMessage"`
@@ -101,7 +109,7 @@ type Person struct {
 	Email                  string      `json:"email"`
 	IdentityDocumentNumber string      `json:"identityDocumentDocumentNumber"`
 	IdentityDocumentType   Translation `json:"identityDocumentType"`
-	DateOfBirth            time.Time   `json:"dateOfBirth"`
+	DateOfBirth            string      `json:"dateOfBirth"`
 	ID                     string      `json:"id"`
 	Surname                string      `json:"surname"`
 	FirstName              string      `json:"firstName"`
